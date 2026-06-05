@@ -4063,7 +4063,7 @@ button.cob-btn.on{
 <!-- ===== FLUJO DE CAJA ===== -->
 <div id="pg-flujo" class="pg">
   <div class="hero">
-    <div class="hero-lbl">FLUJO DE CAJA · MAYO 2026</div>
+    <div class="hero-lbl" id="fc-hero-lbl">FLUJO DE CAJA</div>
     <div class="hero-amt" id="fc-saldo" style="color:var(--KA)">$0</div>
     <div class="hero-sub" id="fc-sub">Saldo disponible estimado</div>
     <div class="hero-chips">
@@ -4072,6 +4072,9 @@ button.cob-btn.on{
     </div>
   </div>
 
+  <!-- SELECTOR DE MES -->
+  <div id="fc-mes-picker" class="mes-picker" style="padding:8px 12px 0"></div>
+
   <!-- TABS -->
   <div style="display:flex;background:white;border-bottom:2px solid rgba(28,45,79,0.08)">
     <button class="ntb on" id="fc-tab-resumen" onclick="switchFCTab('resumen')" style="flex:1;justify-content:center;font-size:11px;padding:9px">Resumen</button>
@@ -4079,7 +4082,7 @@ button.cob-btn.on{
     <button class="ntb" id="fc-tab-cats" onclick="switchFCTab('cats')" style="flex:1;justify-content:center;font-size:11px;padding:9px">Por categoría</button>
   </div>
 
-  <div style="padding:8px 12px 0"><div style="background:white;border-radius:12px;border:2px solid rgba(61,107,42,0.2);padding:14px"><div style="font-size:10px;font-weight:700;color:var(--KG);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Ingreso de Dinero</div><input type="text" id="ic-desc" placeholder="Descripción (préstamo, inversión…)" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(28,45,79,0.18);background:#f9f5ee;color:var(--KD);font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px"><input type="number" id="ic-monto" placeholder="Monto $" inputmode="numeric" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(28,45,79,0.18);background:#f9f5ee;color:var(--KD);font-size:15px;font-weight:700;outline:none;box-sizing:border-box;margin-bottom:8px"><button onclick="regIngresoCaja()" style="width:100%;padding:12px;border-radius:10px;background:var(--KG);color:white;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:0.08em">+ REGISTRAR INGRESO</button></div><div id="ic-list" style="margin-top:8px"></div></div>
+  <div style="padding:8px 12px 0"><div style="background:white;border-radius:12px;border:2px solid rgba(61,107,42,0.2);padding:14px"><div style="font-size:10px;font-weight:700;color:var(--KG);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Ingreso de Dinero</div><div style="display:flex;gap:6px;margin-bottom:8px"><button type="button" id="ic-tipo-oper" onclick="setIcTipo('operativo')" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--KG);background:var(--KG);color:white;font-size:11px;font-weight:700;cursor:pointer">Venta / Operativo</button><button type="button" id="ic-tipo-fin" onclick="setIcTipo('financiero')" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid rgba(28,45,79,0.18);background:#f9f5ee;color:var(--KD);font-size:11px;font-weight:700;cursor:pointer">Préstamo / Aporte</button></div><div id="ic-tipo-hint" style="font-size:10px;color:#999;margin-bottom:8px;line-height:1.4">Operativo = venta o ingreso del negocio (cuenta como ganancia).</div><input type="text" id="ic-desc" placeholder="Descripción" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(28,45,79,0.18);background:#f9f5ee;color:var(--KD);font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px"><input type="number" id="ic-monto" placeholder="Monto $" inputmode="numeric" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(28,45,79,0.18);background:#f9f5ee;color:var(--KD);font-size:15px;font-weight:700;outline:none;box-sizing:border-box;margin-bottom:8px"><button onclick="regIngresoCaja()" style="width:100%;padding:12px;border-radius:10px;background:var(--KG);color:white;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:0.08em">+ REGISTRAR INGRESO</button></div><div id="ic-list" style="margin-top:8px"></div></div>
   <!-- PANE RESUMEN -->
   <div id="fc-pane-resumen">
     <div style="padding:12px" id="fc-resumen-body"></div>
@@ -4199,6 +4202,8 @@ function buildPayload(){
       QS_COMPRAS: typeof QS_COMPRAS !== 'undefined' ? QS_COMPRAS : [],
       EGRESOS: typeof EGRESOS !== 'undefined' ? EGRESOS : [],
       EGRESO_CATS: typeof EGRESO_CATS !== 'undefined' ? EGRESO_CATS : [],
+      INGRESOS_EXTRA: typeof INGRESOS_EXTRA !== 'undefined' ? INGRESOS_EXTRA : [],
+      EGRESOS_MESES_CERRADOS: typeof EGRESOS_MESES_CERRADOS !== 'undefined' ? EGRESOS_MESES_CERRADOS : [],
       navOrder: typeof navOrder !== 'undefined' ? navOrder : null,
       COMBO_DESC: typeof COMBO_DESC !== 'undefined' ? COMBO_DESC : {},
       COMBO_PRECIOS: typeof COMBO_PRECIOS !== 'undefined' ? JSON.parse(JSON.stringify(COMBO_PRECIOS)) : {},
@@ -4805,9 +4810,9 @@ const APP_VERSION='2.0.0'; // Increment this ONLY when a breaking data change oc
                      tweaks de copy.
    Cada release se documenta en CHANGELOG.md
    ======================================================== */
-const APP_RELEASE='v4.5.0';
+const APP_RELEASE='v4.6.0';
 const APP_RELEASE_DATE='2026-06-04';
-const APP_RELEASE_NAME='Backend seguro ACTIVADO: la app habla solo con la Edge Function kiche-gateway (SB_GW.on=true)';
+const APP_RELEASE_NAME='Estado de Resultados real en Flujo: sin doble conteo, ingresos clasificados (operativo vs financiación), análisis de desvío y persistencia de ingresos arreglada';
 
 // Inyectar versión en el badge del login en cuanto cargue el DOM
 document.addEventListener('DOMContentLoaded', function(){
@@ -4984,6 +4989,8 @@ function _origLoadData(){
       if(payload.QS_COMPRAS) QS_COMPRAS=payload.QS_COMPRAS;
       if(payload.EGRESOS) EGRESOS=payload.EGRESOS;
       if(payload.EGRESO_CATS) EGRESO_CATS=payload.EGRESO_CATS;
+      if(payload.INGRESOS_EXTRA) INGRESOS_EXTRA=payload.INGRESOS_EXTRA;
+      if(payload.EGRESOS_MESES_CERRADOS) EGRESOS_MESES_CERRADOS=payload.EGRESOS_MESES_CERRADOS;
 
       // ── Logs (nunca perder) ───────────────────────────────────────────────
       if(payload.MARGEN_LOG) MARGEN_LOG=payload.MARGEN_LOG;
@@ -9435,6 +9442,7 @@ function buildEgresoHero(){
 
 // ===== FLUJO DE CAJA =====
 function buildFlujo(){
+  buildFlujoMesPicker();
   buildFlujoHero();
   buildFlujoResumen();
   buildFlujoMovs();
@@ -9452,6 +9460,40 @@ function getIngresosTotal(mesKey){
 }
 function getEgresosTotal(mesKey){
   return filterMes(EGRESOS || [], mesKey).reduce(function(s,e){return s+(e.monto||0);},0);
+}
+
+// ── CLASIFICACIÓN CONTABLE DE INGRESOS ───────────────────────────────────────
+// Un ingreso cargado a mano puede ser:
+//   • 'operativo'  → venta / ingreso del giro del negocio. ES ganancia, cuenta
+//                    en el Resultado del mes.
+//   • 'financiero' → préstamo / aporte de capital. ENTRA a la caja pero NO es
+//                    ganancia: es financiación (deuda o inversión). NO cuenta
+//                    en el Resultado, solo afecta el saldo de caja.
+// Compatibilidad: ítems viejos sin 'tipo' se asumen 'financiero', porque el
+// formulario histórico estaba rotulado "préstamo, inversión…".
+function ingExtraEsFinanciero(v){ return !v || v.tipo !== 'operativo'; }
+
+// Ingresos OPERATIVOS del mes = ventas de productos + quesos + ingresos
+// operativos cargados a mano. Es la base para medir la ganancia real.
+function getIngresosOperativos(mesKey){
+  const ventasMes = filterMes(ST.ventas || [], mesKey);
+  const flMes     = filterMes(typeof FUERA_LINEA!=='undefined' ? FUERA_LINEA : [], mesKey);
+  const exMes     = filterMes(typeof INGRESOS_EXTRA!=='undefined' ? INGRESOS_EXTRA : [], mesKey);
+  return ventasMes.reduce(function(s,v){return s+(v.total||0);},0)
+       + flMes.reduce(function(s,v){return s+(v.pvta||v.precioVenta||0);},0)
+       + exMes.filter(function(v){return !ingExtraEsFinanciero(v);}).reduce(function(s,v){return s+(v.monto||0);},0);
+}
+// Financiación del mes (préstamos / aportes): entra a caja, NO es ganancia.
+function getFinanciacion(mesKey){
+  const exMes = filterMes(typeof INGRESOS_EXTRA!=='undefined' ? INGRESOS_EXTRA : [], mesKey);
+  return exMes.filter(ingExtraEsFinanciero).reduce(function(s,v){return s+(v.monto||0);},0);
+}
+// Margen teórico según el costeo (Σ ganancia modelada de cada venta del mes).
+function getMargenTeorico(mesKey){
+  const _v  = filterMes(ST.ventas || [], mesKey);
+  const _fl = filterMes(typeof FUERA_LINEA!=='undefined' ? FUERA_LINEA : [], mesKey);
+  return _v.reduce(function(s,v){return s+(v.gan||0);},0)
+       + _fl.reduce(function(s,v){return s+(v.gan||0);},0);
 }
 
 function getActiveFlujoMes(){ return window.FLUJO_MES; /* null = current */ }
@@ -9489,6 +9531,11 @@ function buildFlujoMesPicker(){
 
 function buildFlujoHero(){
   const mesKey = getActiveFlujoMes();
+  const lbl=document.getElementById('fc-hero-lbl');
+  if(lbl){
+    const m = (mesKey==='all') ? 'TODOS LOS MESES' : fmtMesKey(mesKey||getCurrentMesKey()).toUpperCase();
+    lbl.textContent='FLUJO DE CAJA · '+m;
+  }
   const ing=getIngresosTotal(mesKey);
   const eg=getEgresosTotal(mesKey);
   const saldo=ing-eg;
@@ -9506,69 +9553,138 @@ function buildFlujoResumen(){
   const el=document.getElementById('fc-resumen-body');
   if(!el)return;
   const mesKey=getActiveFlujoMes();
-  const ing=getIngresosTotal(mesKey);
-  const eg=getEgresosTotal(mesKey);
-  const saldo=ing-eg;
-  const _vF = filterMes(ST.ventas||[], mesKey);
+  const _vF  = filterMes(ST.ventas||[], mesKey);
   const _flF = filterMes(typeof FUERA_LINEA!=='undefined' ? FUERA_LINEA : [], mesKey);
-  const ganVentas=_vF.reduce((s,v)=>s+(v.gan||0),0)+_flF.reduce((s,v)=>s+(v.gan||0),0);
-  const costoFijoMes=totalFijos();
-  const pctEgVsIng=ing>0?Math.round(eg/ing*100):0;
-  const udsVendidas=_vF.reduce((s,v)=>s+(v.uds||0),0)+_flF.length;
-  const _nTx=_vF.length+_flF.length;
+  const _exF = filterMes(typeof INGRESOS_EXTRA!=='undefined' ? INGRESOS_EXTRA : [], mesKey);
+
+  // ── Ingresos OPERATIVOS (lo que es ganancia genuina) ─────────────────────
+  const ventasTot = _vF.reduce((s,v)=>s+(v.total||0),0);
+  const quesosTot = _flF.reduce((s,v)=>s+(v.pvta||v.precioVenta||0),0);
+  const otrosOper = _exF.filter(v=>!ingExtraEsFinanciero(v)).reduce((s,v)=>s+(v.monto||0),0);
+  const ingOper   = ventasTot + quesosTot + otrosOper;
+  // ── Egresos reales y financiación ────────────────────────────────────────
+  const eg        = getEgresosTotal(mesKey);
+  const financ    = getFinanciacion(mesKey);
+  // ── Resultado REAL (método caja) — sin doble conteo ──────────────────────
+  const resultado = ingOper - eg;
+  const saldoCaja = ingOper + financ - eg;            // financiación entra a caja
+  const margenNeto= ingOper>0 ? Math.round(resultado/ingOper*100) : 0;
+  // ── Comparación contra el costeo (margen teórico) ────────────────────────
+  const margenTeo = getMargenTeorico(mesKey);
+  const desvio    = resultado - margenTeo;
+  // ── KPIs ─────────────────────────────────────────────────────────────────
+  const pctEg     = ingOper>0 ? Math.round(eg/ingOper*100) : 0;
+  const uds       = _vF.reduce((s,v)=>s+(v.uds||0),0) + _flF.length;
+  const nTx       = _vF.length + _flF.length;
+  const ticket    = uds>0 ? Math.round((ventasTot+quesosTot)/uds) : 0;
+  const sinDatos  = (ingOper===0 && eg===0 && financ===0);
+
+  // Interpretación del desvío
+  const umbral = Math.max(ingOper*0.05, 1);
+  let desvText, desvColor;
+  if(sinDatos){ desvText='Cargá ventas y egresos del mes para ver el análisis.'; desvColor='#888'; }
+  else if(Math.abs(desvio) <= umbral){ desvText='Tu costeo refleja bien la realidad: lo que ganaste se parece a lo que el modelo predice. ✓'; desvColor='var(--KG)'; }
+  else if(desvio < 0){ desvText='Ganaste menos que lo previsto por el costeo. Causas habituales: compraste materia prima de más (stock para meses siguientes), costos reales por encima del estándar, desperdicio, o descuentos no registrados.'; desvColor='var(--K)'; }
+  else { desvText='Ganaste más que lo previsto por el costeo. Causas habituales: consumiste stock comprado en meses anteriores, ahorraste en packaging/insumos, o faltan egresos por cargar este mes.'; desvColor='var(--KA)'; }
+
+  const subRow=(label,val)=>val>0?`<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0 3px 12px">
+      <span style="color:rgba(255,255,255,0.55)">${label}</span><span style="color:rgba(255,255,255,0.8);font-weight:700">${ars(val)}</span></div>`:'';
 
   el.innerHTML=`
+    <!-- ESTADO DE RESULTADOS (método caja real) -->
+    <div style="background:var(--KD);border-radius:14px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--KA);letter-spacing:0.12em;text-transform:uppercase">Resultado del mes</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700">${fmtMesLabel(mesKey)}</div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0">
+        <span style="color:var(--KC);font-weight:700">Ingresos operativos</span>
+        <span style="color:#7abf6a;font-weight:700;font-family:'Oswald',sans-serif">+ ${ars(ingOper)}</span>
+      </div>
+      ${subRow('Ventas de productos', ventasTot)}
+      ${subRow('Quesos', quesosTot)}
+      ${subRow('Otros ingresos operativos', otrosOper)}
+
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-top:1px solid rgba(255,255,255,0.1);margin-top:6px">
+        <span style="color:var(--KC);font-weight:700">− Egresos del mes</span>
+        <span style="color:#f08070;font-weight:700;font-family:'Oswald',sans-serif">− ${ars(eg)}</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0 2px;margin-top:6px;border-top:2px solid rgba(212,168,67,0.4)">
+        <div>
+          <div style="color:var(--KA);font-weight:700;font-size:13px">RESULTADO NETO</div>
+          <div style="color:rgba(255,255,255,0.5);font-size:10px;margin-top:1px">${margenNeto}% de margen neto · ganancia real</div>
+        </div>
+        <span style="font-size:28px;font-weight:700;font-family:'Oswald',sans-serif;color:${resultado>=0?'#7abf6a':'#f08070'}">${ars(resultado)}</span>
+      </div>
+
+      ${financ>0?`<div style="margin-top:12px;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.18)">
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0">
+          <span style="color:rgba(255,255,255,0.6);font-weight:700">+ Financiación (préstamos/aportes)</span>
+          <span style="color:rgba(255,255,255,0.85);font-weight:700;font-family:'Oswald',sans-serif">+ ${ars(financ)}</span>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px">No es ganancia — entra a caja como deuda o aporte</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-top:1px solid rgba(255,255,255,0.1)">
+          <span style="color:var(--KA);font-weight:700">= Saldo de caja del mes</span>
+          <span style="font-weight:700;font-family:'Oswald',sans-serif;color:${saldoCaja>=0?'#7abf6a':'#f08070'}">${ars(saldoCaja)}</span>
+        </div>
+      </div>`:''}
+    </div>
+
+    <!-- KPIs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
+        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Margen neto</div>
+        <div style="font-size:22px;font-weight:700;font-family:'Oswald',sans-serif;color:${resultado>=0?'var(--KG)':'var(--K)'}">${margenNeto}%</div>
+        <div style="font-size:9px;color:#aaa">del ingreso operativo</div>
+      </div>
+      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
+        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Ticket promedio</div>
+        <div style="font-size:22px;font-weight:700;font-family:'Oswald',sans-serif;color:var(--KD)">${ars(ticket)}</div>
+        <div style="font-size:9px;color:#aaa">por unidad vendida</div>
+      </div>
+      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
+        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Egresos / Ingresos</div>
+        <div style="font-size:22px;font-weight:700;font-family:'Oswald',sans-serif;color:${pctEg<=70?'var(--KG)':(pctEg<=100?'var(--KA)':'var(--K)')}">${pctEg}%</div>
+        <div style="font-size:9px;color:#aaa">de cada $ que entró</div>
+      </div>
+      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
+        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Unidades</div>
+        <div style="font-size:22px;font-weight:700;font-family:'Oswald',sans-serif;color:var(--KD)">${uds}</div>
+        <div style="font-size:9px;color:#aaa">en ${nTx} ventas</div>
+      </div>
+    </div>
+
+    <!-- ANÁLISIS DE DESVÍO (real vs costeo) -->
+    <div style="background:white;border-radius:12px;border:2px solid rgba(28,45,79,0.08);padding:14px;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;color:var(--KD);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">Análisis de desvío</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0">
+        <span style="color:#666;font-weight:700">Resultado real (caja)</span>
+        <span style="font-weight:700;font-family:'Oswald',sans-serif;color:${resultado>=0?'var(--KG)':'var(--K)'}">${ars(resultado)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(28,45,79,0.08)">
+        <span style="color:#666;font-weight:700">Margen previsto (costeo)</span>
+        <span style="font-weight:700;font-family:'Oswald',sans-serif;color:var(--KD)">${ars(margenTeo)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:8px 0 6px">
+        <span style="color:var(--KD);font-weight:700">Desvío</span>
+        <span style="font-weight:700;font-family:'Oswald',sans-serif;color:${desvColor}">${desvio>=0?'+':''}${ars(desvio)}</span>
+      </div>
+      <div style="font-size:11px;line-height:1.5;color:#666;background:rgba(28,45,79,0.04);border-radius:8px;padding:9px 11px;border-left:3px solid ${desvColor}">${desvText}</div>
+      ${!sinDatos?`<div style="font-size:10px;color:#aaa;margin-top:8px;line-height:1.5">El desvío oscila mes a mes según cuándo comprás stock (una compra grande pesa en el mes que la cargás). Leelo como <strong>tendencia en 2-3 meses</strong>, no mes aislado.</div>`:''}
+    </div>
+
     <!-- Barra visual ingreso vs egreso -->
-    <div style="background:white;border-radius:12px;border:2px solid rgba(28,45,79,0.08);padding:14px;margin-bottom:10px">
-      <div style="font-size:10px;font-weight:700;color:var(--KD);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">Ingresos vs Egresos</div>
-      <div style="display:flex;gap:4px;height:24px;border-radius:6px;overflow:hidden;margin-bottom:8px">
-        <div style="background:var(--KG);flex:${ing}" title="Ingresos"></div>
-        <div style="background:var(--K);flex:${eg}" title="Egresos"></div>
+    <div style="background:white;border-radius:12px;border:2px solid rgba(28,45,79,0.08);padding:14px">
+      <div style="font-size:10px;font-weight:700;color:var(--KD);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">Ingresos operativos vs Egresos</div>
+      <div style="display:flex;gap:4px;height:24px;border-radius:6px;overflow:hidden;margin-bottom:8px;background:rgba(28,45,79,0.06)">
+        <div style="background:var(--KG);flex:${Math.max(ingOper,0)}"></div>
+        <div style="background:var(--K);flex:${Math.max(eg,0)}"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:11px">
-        <span style="color:var(--KG);font-weight:700">↑ Ingresos ${ars(ing)} (${100-pctEgVsIng}%)</span>
-        <span style="color:var(--K);font-weight:700">↓ Egresos ${ars(eg)} (${pctEgVsIng}%)</span>
-      </div>
-    </div>
-
-    <!-- Métricas clave -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
-        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Saldo disponible</div>
-        <div style="font-size:20px;font-weight:700;font-family:'Oswald',sans-serif;color:${saldo>=0?'var(--KG)':'var(--K)'}">${ars(saldo)}</div>
-      </div>
-      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
-        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Ganancia real</div>
-        <div style="font-size:20px;font-weight:700;font-family:'Oswald',sans-serif;color:${ganVentas>=0?'var(--KG)':'var(--K)'}">${ars(ganVentas)}</div>
-        <div style="font-size:9px;color:#aaa">después de costos de producto</div>
-      </div>
-      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
-        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Ventas</div>
-        <div style="font-size:20px;font-weight:700;font-family:'Oswald',sans-serif;color:var(--KD)">${udsVendidas} uds</div>
-        <div style="font-size:9px;color:#aaa">${_nTx} transacciones</div>
-      </div>
-      <div style="background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:12px">
-        <div style="font-size:10px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:4px">Costo fijo mes</div>
-        <div style="font-size:20px;font-weight:700;font-family:'Oswald',sans-serif;color:var(--KD)">${ars(costoFijoMes)}</div>
-        <div style="font-size:9px;color:#aaa">estructural mensual</div>
-      </div>
-    </div>
-
-    <!-- Ganancia neta final -->
-    <div style="background:var(--KD);border-radius:12px;padding:14px">
-      <div style="font-size:10px;font-weight:700;color:var(--KA);letter-spacing:0.12em;margin-bottom:10px">RESULTADO NETO ESTIMADO</div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1)">
-        <span style="color:rgba(255,255,255,0.75);font-weight:700">Total facturado</span><span style="color:var(--KC);font-weight:700">${ars(ing)}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1)">
-        <span style="color:rgba(255,255,255,0.75);font-weight:700">− Costo variable productos</span><span style="color:#f08070;font-weight:700">− ${ars(ing-ganVentas)}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.1)">
-        <span style="color:rgba(255,255,255,0.75);font-weight:700">− Egresos registrados</span><span style="color:#f08070;font-weight:700">− ${ars(eg)}</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0 0;margin-top:4px">
-        <span style="color:var(--KA);font-weight:700">Resultado neto</span>
-        <span style="font-size:20px;font-weight:700;font-family:'Oswald',sans-serif;color:${(ganVentas-eg)>=0?'#7abf6a':'#f08070'}">${ars(ganVentas-eg)}</span>
+        <span style="color:var(--KG);font-weight:700">↑ ${ars(ingOper)}</span>
+        <span style="color:var(--K);font-weight:700">↓ ${ars(eg)}</span>
       </div>
     </div>
   `;
@@ -9955,6 +10071,7 @@ function goPageById(id){
   buildNav();
   var c=document.querySelector('.content');if(c)c.scrollTop=0;
   if(id==='sistema')setTimeout(buildSistema,80);
+  if(id==='flujo')setTimeout(buildFlujo,80);
   if(id==='historial')setTimeout(buildHistorial,80);
   if(id==='dash')setTimeout(buildDashCharts,100);
   if(id==='usuarios')setTimeout(buildUsuariosPage,80);
@@ -10576,6 +10693,8 @@ function importarDatos(event){
       if(snapshot.QS_COMPRAS) QS_COMPRAS=snapshot.QS_COMPRAS;
       if(snapshot.EGRESOS) EGRESOS=snapshot.EGRESOS;
       if(snapshot.EGRESO_CATS) EGRESO_CATS=snapshot.EGRESO_CATS;
+      if(snapshot.INGRESOS_EXTRA) INGRESOS_EXTRA=snapshot.INGRESOS_EXTRA;
+      if(snapshot.EGRESOS_MESES_CERRADOS) EGRESOS_MESES_CERRADOS=snapshot.EGRESOS_MESES_CERRADOS;
       if(snapshot.MARGEN_LOG) MARGEN_LOG=snapshot.MARGEN_LOG;
       if(snapshot.PRECIO_LOG) PRECIO_LOG=snapshot.PRECIO_LOG;
       if(snapshot.CHANGE_LOG) CHANGE_LOG=snapshot.CHANGE_LOG;
@@ -10701,6 +10820,8 @@ function restorePayload(payload){
   if(payload.QS_COMPRAS) QS_COMPRAS=payload.QS_COMPRAS;
   if(payload.EGRESOS) EGRESOS=payload.EGRESOS;
   if(payload.EGRESO_CATS) EGRESO_CATS=payload.EGRESO_CATS;
+  if(payload.INGRESOS_EXTRA) INGRESOS_EXTRA=payload.INGRESOS_EXTRA;
+  if(payload.EGRESOS_MESES_CERRADOS) EGRESOS_MESES_CERRADOS=payload.EGRESOS_MESES_CERRADOS;
   if(payload.MARGEN_LOG) MARGEN_LOG=payload.MARGEN_LOG;
   if(payload.PRECIO_LOG) PRECIO_LOG=payload.PRECIO_LOG;
   if(payload.CHANGE_LOG) CHANGE_LOG=payload.CHANGE_LOG;
@@ -13587,23 +13708,51 @@ function enterApp(){
     UsersAPI.boot();
   }
 }
+var _icTipo='operativo';
+function setIcTipo(t){
+  _icTipo=t;
+  var bo=document.getElementById('ic-tipo-oper'), bf=document.getElementById('ic-tipo-fin'), hint=document.getElementById('ic-tipo-hint');
+  if(bo&&bf){
+    if(t==='operativo'){
+      bo.style.background='var(--KG)'; bo.style.color='white'; bo.style.borderColor='var(--KG)';
+      bf.style.background='#f9f5ee'; bf.style.color='var(--KD)'; bf.style.borderColor='rgba(28,45,79,0.18)';
+    }else{
+      bf.style.background='var(--KA)'; bf.style.color='var(--KD)'; bf.style.borderColor='var(--KA)';
+      bo.style.background='#f9f5ee'; bo.style.color='var(--KD)'; bo.style.borderColor='rgba(28,45,79,0.18)';
+    }
+  }
+  if(hint) hint.textContent = t==='operativo'
+    ? 'Operativo = venta o ingreso del negocio (cuenta como ganancia).'
+    : 'Financiación = préstamo o aporte: entra a caja pero NO es ganancia.';
+}
 function regIngresoCaja(){
   var desc=((document.getElementById('ic-desc')||{}).value||'').trim();
   var monto=parseFloat((document.getElementById('ic-monto')||{}).value)||0;
   if(!desc){toast('Ingresa descripcion');return;} if(!monto){toast('Ingresa monto');return;}
   var now=new Date();
-  INGRESOS_EXTRA.push({_idx:Date.now(),desc:desc,monto:monto,fecha:now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),ts:now.toISOString()});
+  INGRESOS_EXTRA.push({_idx:Date.now(),desc:desc,monto:monto,tipo:_icTipo,fecha:now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}),ts:now.toISOString()});
+  if(typeof logChange==='function') logChange('Ingreso registrado', desc+' ('+(_icTipo==='operativo'?'operativo':'financiación')+')', '', ars(monto));
   saveData(); buildFlujo();
   var di=document.getElementById('ic-desc'); if(di)di.value='';
   var mi=document.getElementById('ic-monto'); if(mi)mi.value='';
   toast('Ingreso registrado'); vibrate();
+}
+function toggleIngresoTipo(idx){
+  var v=INGRESOS_EXTRA.find(function(x){return x._idx===idx;});
+  if(!v)return;
+  v.tipo = ingExtraEsFinanciero(v) ? 'operativo' : 'financiero';
+  saveData(); buildFlujo();
+  toast(v.tipo==='operativo'?'Marcado como operativo':'Marcado como financiación');
 }
 function delIngresoCaja(idx){INGRESOS_EXTRA=INGRESOS_EXTRA.filter(function(v){return v._idx!==idx;});saveData();buildFlujo();toast('Eliminado');}
 function buildIngresosExtraList(){
   var el=document.getElementById('ic-list'); if(!el)return;
   if(!INGRESOS_EXTRA||!INGRESOS_EXTRA.length){el.innerHTML='';return;}
   el.innerHTML=INGRESOS_EXTRA.slice().reverse().map(function(v){
-    return '<div style="display:flex;align-items:center;background:white;border-radius:10px;border:2px solid rgba(61,107,42,0.12);padding:10px 12px;margin-bottom:6px;gap:10px"><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--KD)">'+v.desc+'</div><div style="font-size:11px;color:#aaa">'+v.fecha+'</div></div><div style="font-size:15px;font-weight:700;color:var(--KG)">'+ars(v.monto)+'</div><button onclick="delIngresoCaja('+v._idx+')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--K);font-size:18px">x</button></div>';
+    var fin=ingExtraEsFinanciero(v);
+    var badgeCol=fin?'var(--KA)':'var(--KG)';
+    var badgeTxt=fin?'Financiación':'Operativo';
+    return '<div style="display:flex;align-items:center;background:white;border-radius:10px;border:2px solid rgba(28,45,79,0.08);padding:10px 12px;margin-bottom:6px;gap:10px"><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--KD)">'+v.desc+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:2px"><span style="font-size:9px;font-weight:700;padding:1px 7px;border-radius:7px;background:'+badgeCol+'22;color:'+badgeCol+'">'+badgeTxt+'</span><span style="font-size:11px;color:#aaa">'+v.fecha+'</span></div></div><div style="font-size:15px;font-weight:700;color:'+badgeCol+';font-family:\'Oswald\',sans-serif">'+ars(v.monto)+'</div><button onclick="toggleIngresoTipo('+v._idx+')" title="Cambiar tipo" style="background:none;border:1.5px solid rgba(28,45,79,0.15);border-radius:7px;cursor:pointer;padding:4px 7px;color:var(--KD);font-size:10px;font-weight:700">⇄</button><button onclick="delIngresoCaja('+v._idx+')" style="background:none;border:none;cursor:pointer;padding:4px;color:var(--K);font-size:18px">×</button></div>';
   }).join('');
 }
 var _egPieChart=null; var EGC=['oklch(0.58 0.17 35)','oklch(0.72 0.13 75)','oklch(0.55 0.13 148)','oklch(0.55 0.10 220)','oklch(0.34 0.04 252)','oklch(0.48 0.10 50)','oklch(0.55 0.13 305)','oklch(0.65 0.15 45)'];
